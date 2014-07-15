@@ -9,3 +9,4 @@ threads=[]
 aurl = 'http://douban.fm/j/mine/playlist?type=n&'
 murl='channel=1'
 burl = '&from=mainsite'
+token = '&r=6329aced1f'

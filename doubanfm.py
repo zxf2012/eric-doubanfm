@@ -9,11 +9,13 @@ import os
 import nameV
 import urllib  
 import json
-import pyglet
-
+import pymedia.muxer as muxer
+import pymedia.audio.acodec as acodec
+import pymedia.audio.sound as sound
+import os.path as path
 
 def getPlayList():
-	url = nameV.aurl + nameV.murl + nameV.burl
+	url = nameV.aurl + nameV.murl + nameV.burl +nameV.token
 	print '请求播放列表地址'
 	print url
 	page_source = None
@@ -34,18 +36,38 @@ def printPlayList():
 	print '------------------'
 	play()
 
-def play():
-	file_ = nameV.songList[0]
-	next_file = nameV.songList[1]
-	#fileName = file_['url'] 
-	#fileName = 'http://v.youku.com/v_show/id_XNzA1MDI2NDcy_ev_1.html'
-	fileName = 'test.mp3'
-	#source = pyglet.media.load('/Users/zxq517/Music/English/I Can.mp3', streaming=True)
-	print file_['url'] 
-	music = pyglet.resource.media(fileName, streaming=False)
-	music.play()
-	
-	pyglet.app.run()
+def play(self):
+    file_ = nameV.songList[0]
+    #fileName = file_['url']
+    fileName = 'D:/githubworkspace/eric-doubanfm/test.mp3'
+    file_path = "/home/archy/Documents/python/yshouge.mp3"
+    root,ext = path.splitext(fileName)
+    demuxer = muxer.Demuxer(ext[1:].lower())
+    decoder = None
+    output = None
+
+    file = open(file_path,'rb')
+    data = ' '
+    while data:
+        data = file.read(20000)
+        if len(data):
+            frames = demuxer.parse(data)
+            for frame in frames:
+                if decoder == None:
+                    decoder = acodec.Decoder(demuxer.streams[0])
+
+                audio_frame = decoder.decode(frame[1])
+                if audio_frame and audio_frame.data:
+                    if output==None:
+                        output = sound.Output(audio_frame.sample_rate,audio_frame.channels,sound.AFMT_S16_LE)
+
+                    while self.stop:
+                        time.sleep(1)
+
+                    output.play(audio_frame.data)
+
+            while output.isPlaying():
+                time.sleep( 0.05 )
 
 getPlayList()
 	
