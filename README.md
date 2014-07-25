@@ -1,4 +1,4 @@
 eric-doubanfm
 =============
-this is a doubanfm based on pyhton
-doubanfm based on pyhton
+this is a doubanfm of shell based on pyhton
+reuqirement:ffmpeg https://www.ffmpeg.org/
