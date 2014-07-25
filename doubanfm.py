@@ -3,16 +3,16 @@
 #Filename : doubanfm.py
 
 import sys
-reload(sys) # Python2.5 初始化后会删除 sys.setdefaultencoding 这个方法，我们需要重新载入   
-sys.setdefaultencoding('utf-8') 
+reload(sys) # Python2.5 初始化后会删除 sys.setdefaultencoding 这个方法，我们需要重新载入
+sys.setdefaultencoding('utf-8')
 import os
 import nameV
-import urllib  
+import urllib
 import json
 import subprocess
 
 def getPlayList():
-	url = nameV.aurl + nameV.murl + nameV.burl +nameV.token
+	url = nameV.renrenurl
 	print '请求播放列表地址'
 	print url
 	page_source = None
@@ -22,26 +22,36 @@ def getPlayList():
 		print Exception, ":", data
 	pageData = page_source.read()
 	jsonData = json.loads(pageData)
-	nameV.songList = jsonData['song']
+	nameV.songList = jsonData['songs']
 	printPlayList()
-	
+
 def printPlayList():
 	print '------播放列表------'
 	for song in nameV.songList:
-		print song['title']
+	    print song['name'],song['artistName']
 	print '------------------'
-	play()
+        while True:
+            play()
 
 def play():
-    file_ = nameV.songList[0]
-    fileName = file_['url']
-    print fileName
+    if len(nameV.songList) < 2:
+        getPlayList()
+    song = nameV.songList.pop(0)
+    songSrc = song['src']
+    songName = song['name']
+    artistName = song['artistName']
+    print '正在播放：',songName, '由',artistName,'演唱'
     #fileName = 'D:/githubworkspace/eric-doubanfm/p1022892.mp4'
-    cmd = ['ffplay',fileName,'-nodisp','-autoexit']
-    pro = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    cmd = ['ffplay',songSrc,'-autoexit']
+    p = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    while True:
+        print p.communicate()
     try:
-        pro.communicate()
+        p.communicate()
     except Exception,e:
-        pro.terminate()
+        p.terminate()
 
-getPlayList()
+def main():
+    getPlayList()
+if __name__=='__main__':
+    main()
