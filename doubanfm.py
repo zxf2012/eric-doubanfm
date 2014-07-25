@@ -35,6 +35,7 @@ def printPlayList():
 def play():
     file_ = nameV.songList[0]
     fileName = file_['url']
+    print fileName
     #fileName = 'D:/githubworkspace/eric-doubanfm/p1022892.mp4'
     cmd = ['ffplay',fileName,'-nodisp','-autoexit']
     pro = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
