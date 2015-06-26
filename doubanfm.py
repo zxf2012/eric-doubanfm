@@ -10,6 +10,7 @@ import nameV
 import urllib
 import json
 import subprocess
+from select import select
 
 def getPlayList():
 	url = nameV.renrenurl
@@ -41,15 +42,41 @@ def play():
     songName = song['name']
     artistName = song['artistName']
     print '正在播放：',songName, '由',artistName,'演唱'
-    #fileName = 'D:/githubworkspace/eric-doubanfm/p1022892.mp4'
     cmd = ['ffplay',songSrc,'-autoexit']
-    p = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    while True:
-        print p.communicate()
+    p = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     try:
         p.communicate()
     except Exception,e:
         p.terminate()
+def control(self,r):
+    rlist, _, _ = select([sys.stdin], [], [], 1)
+    if rlist:
+        s = sys.stdin.readline().rstrip()
+        if s:
+            if s == 'n':
+                print '下一首...'
+                #self.skip_mode = True
+                return 'next'
+            elif s == 'f' and self.private:
+                print '正在加心...'
+                #self.user.fav_song(r['sid'], r['aid'])
+                print "加心成功:)\n"
+                return 'fav'
+            elif s == 'd' and self.private:
+                print '不再收听...'
+                #self.songlist = self.user.del_song(r['sid'], r['aid'])
+                print "删歌成功:)\n"
+                return 'del'
+            elif s == 'p' and not self.pause:
+                print '已暂停...'
+                print '输入p以恢复播放\n'
+                return 'pause'
+            elif s == 'r' and self.pause:
+                print '恢复播放...'
+                print '继续享受美妙的音乐吧:)\n'
+                return 'resume'
+            else:
+                print '错误的操作，请重试\n'
 
 def main():
     getPlayList()
